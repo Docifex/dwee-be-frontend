@@ -1,0 +1,161 @@
+/**
+ * LandingPage.jsx
+ * This component renders the landing page for the Dwee.be website.
+ * It features an animated background of bouncing balls and panels for login/access requests.
+ * Includes a confirmation pop-up when submitting the access request.
+ */
+
+import React, { useRef, useEffect, useState } from 'react';
+import { COLOR_ARRAY } from '../theme/colors.js';
+
+function randomBetween(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+class Ball {
+  constructor(x, y, vx, vy, r, color) {
+    this.x = x; this.y = y; this.vx = vx; this.vy = vy;
+    this.r = r; this.color = color; this.text = 'DWEE.BE';
+    this.strokeColor = '#ffffff'; this.strokeWidth = 0.5;
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+    ctx.fillStyle = this.color; ctx.fill();
+    ctx.lineWidth = this.strokeWidth; ctx.strokeStyle = this.strokeColor; ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.font = `${this.r * 0.6}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(this.text, this.x, this.y);
+    ctx.restore();
+  }
+  update(canvas, others) {
+    const headerHeight = this.r * 2;
+    this.x += this.vx; this.y += this.vy;
+    if (this.x - this.r < 0 || this.x + this.r > canvas.width) this.vx *= -1;
+    if (this.y - this.r < headerHeight) { this.vy *= -1; this.y = headerHeight + this.r; }
+    else if (this.y + this.r > canvas.height) this.vy *= -1;
+    for (let other of others) {
+      if (other === this) continue;
+      const dx = other.x - this.x, dy = other.y - this.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < this.r + other.r) {
+        [this.vx, other.vx] = [other.vx, this.vx];
+        [this.vy, other.vy] = [other.vy, this.vy];
+      }
+    }
+  }
+}
+
+export default function LandingPage() {
+  const canvasRef = useRef(null);
+  const [showPanels, setShowPanels] = useState(false);
+  const [showApplyForm, setShowApplyForm] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  // Form input state
+  const [fullName, setFullName] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const BALL_RADIUS = 30;
+  const BALL_DIAMETER = BALL_RADIUS * 2;
+  const PANEL_SIZE = BALL_DIAMETER * 6;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    const onResize = () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; };
+    window.addEventListener('resize', onResize);
+    const balls = [];
+    for (let i = 0; i < 55; i++) {
+      balls.push(new Ball(
+        randomBetween(BALL_RADIUS, width - BALL_RADIUS),
+        randomBetween(BALL_RADIUS, height - BALL_RADIUS),
+        randomBetween(-2, 2), randomBetween(-2, 2), BALL_RADIUS,
+        COLOR_ARRAY[i % COLOR_ARRAY.length]
+      ));
+    }
+    let anim;
+    const render = () => {
+      ctx.fillStyle = COLOR_ARRAY[0]; ctx.fillRect(0, 0, width, height);
+      balls.forEach(b => { b.update(canvas, balls); b.draw(ctx); });
+      anim = requestAnimationFrame(render);
+    };
+    render();
+    return () => { cancelAnimationFrame(anim); window.removeEventListener('resize', onResize); };
+  }, []);
+
+  const headerStyle = {
+    position: 'absolute', top: 0, left: 0, width: '99%',
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    padding: '0px 60px 0px 10px', height: `${BALL_DIAMETER}px`,
+    background: COLOR_ARRAY[11], color: '#fff', zIndex: 2
+  };
+  const buttonStyle = {
+    width: `${BALL_DIAMETER}px`, height: `${BALL_DIAMETER}px`, borderRadius: '50%',
+    border: 'none', backgroundColor: COLOR_ARRAY[3], color: '#fff', cursor: 'pointer', fontWeight: 'bold'
+  };
+  const panelContainerStyle = {
+    position: 'absolute', top: `${BALL_DIAMETER}px`, left: 0,
+    width: '100%', height: `calc(100vh - ${BALL_DIAMETER}px)`,
+    display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 3
+  };
+  const panelStyle = {
+    width: `${PANEL_SIZE}px`, height: `${PANEL_SIZE}px`, borderRadius: '50%',
+    background: COLOR_ARRAY[3], display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', margin: '0 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+  };
+  const panelStyle1 = {
+    width: `${PANEL_SIZE}px`, height: `${PANEL_SIZE}px`, borderRadius: '50%',
+    background: COLOR_ARRAY[5], display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', margin: '0 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+  };
+  const confirmationStyle = {
+    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+    background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 4
+  };
+  const messageBoxStyle = {
+    background: '#fff', padding: '20px', borderRadius: '8px', textAlign: 'center', maxWidth: '300px'
+  };
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
+      <header style={headerStyle}>
+        <div style={{ fontSize: '1.2em', fontWeight: 'bold' }}>DWEE.BE</div>
+        <button style={buttonStyle} onClick={() => setShowPanels(!showPanels)}>ALPHA PHASE ACCESS</button>
+      </header>
+
+      {showPanels && (
+        <div style={panelContainerStyle}>
+          <div style={panelStyle}>
+            <h2 style={{ textAlign: 'center', marginBottom: '16px', color: COLOR_ARRAY[1] }}>ALPHA PHASE LOGIN</h2>
+            <input type="text" placeholder="Username" style={{ width: '60%', margin: '10px auto', padding: '8px' }} maxLength={30} pattern="[A-Za-z0-9_@.+-]+" title="Letters, numbers, @ . + - _ only" autoComplete="username" />
+            <input type="password" placeholder="Password" style={{ width: '60%', margin: '10px auto', padding: '8px' }} maxLength={64} autoComplete="current-password" />
+            <button style={{ width: '50%', margin: '10px auto', padding: '12px', background: COLOR_ARRAY[10], color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Login</button>
+          </div>
+          <div style={panelStyle1}>
+            <h2 style={{ textAlign: 'center', marginBottom: '16px', color: COLOR_ARRAY[8] }}>INVITED<br/>ALPHA USERS</h2>
+            {!showApplyForm ? (
+              <button style={{ width: '75%', padding: '48px 0', background: COLOR_ARRAY[10], color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} onClick={() => setShowApplyForm(true)}>APPLY FOR ACCESS</button>
+            ) : (
+              <form onSubmit={(e) => { e.preventDefault(); setShowConfirmation(true); }} style={{ width: '80%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <input type="text" placeholder="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} style={{ width: '100%', margin: '8px 0', padding: '8px' }} />
+                <input type="email" placeholder="Email Address" value={emailAddress} onChange={(e) => setEmailAddress(e.target.value)} style={{ width: '100%', margin: '8px 0', padding: '8px' }} />
+                <textarea placeholder="Enter Your Invite Code" rows={1} value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} style={{ width: '100%', margin: '8px 0', padding: '8px' }} />
+                <button type="submit" style={{ width: '60%', padding: '12px 0', background: COLOR_ARRAY[10], color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Submit Request</button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {showConfirmation && (
+        <div style={confirmationStyle}>
+          <div style={messageBoxStyle}>
+            <p>A member of our team will email with further instructions</p>
+            <button onClick={() => { setShowConfirmation(false); setFullName(''); setEmailAddress(''); setInviteCode(''); }} style={{ marginTop: '12px', padding: '8px 16px', border: 'none', background: COLOR_ARRAY[3], color: '#fff', cursor: 'pointer', borderRadius: '4px' }}>Close</button>
+          </div>
+        </div>
+      )}
+
+      <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+    </div>
+  );
+}

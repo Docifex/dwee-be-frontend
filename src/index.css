@@ -1,0 +1,107 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   src/index.css
+   Pure CSS—no Tailwind dependencies
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* 1) Defines our brand colors as CSS variables
+   ------------------------------------------------
+   Copied these values exactly from our src/theme/colors.js */
+:root {
+  --color-black-purple-dweebe:   #1a0123; /* BRAND_COLORS.black-purple-dweebe */
+  --color-eblue-dweebe:          #00e1ff; /* BRAND_COLORS.eblue.dweebe turquise electric blue */
+  --color-eorange-dweebe:        #fb6e05; /* BRAND_COLORS.eorange.dweebe electric orange */
+  --color-epink-dweebe:          #f617de; /* BRAND_COLORS.epink.dweebe pink electric*/
+  --color-egreen-dweebe:         #17f851; /* BRAND_COLORS.egreen.dweebe green electric */
+  --color-emint-dweebe:          #01ffcd; /* BRAND_COLORS.emint.dweebe electric mint*/
+  --color-mred-dweebe:           #d24a24; /* BRAND_COLORS.mred.dweebe color for david and anna d24 & a24*/
+  --color-ered-dweebe:           #f70000; /* BRAND_COLORS.ered.dweebe red electric*/
+  --color-mblue-dweebe:          #0f227e; /* BRAND_COLORS.mblue.dweebe medium blue */
+  --color-msalmon-dweebe:        #d6976f; /* BRAND_COLORS.msalmon.dweebe medium salmon color*/
+  --color-dgray-dweebe:          #141414; /* BRAND_COLORS.dgray.dweebe not black but dark gray*/
+  --color-nightsky-dweebe:       #05010d; /* BRAND_COLORS.nightsky-dweebe blueish night sky*/
+  --color-epurple-dweebe:        #8c1ffa; /* BRAND_COLORS.epurple.dweebe purple electric */   
+  --color-white-dweebe:          #f9f9ef; /* BRAND_COLORS.white.dweebe white with a little sun*/
+  --color-midnight-anna-dweebe:  #00000a; /* BRAND_COLORS.midnight-anna-dweebe midnight blue for Anna */
+  --color-melyellow-dweebe:      #eded06ff; /* BRAND_COLORS.melyellow-dweebe mellow yellow  */
+
+
+
+  /* Typography & base resets */
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* Light/dark support */
+  color-scheme: light dark;
+
+  /* Rendering optimizations */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 2) Global element styles
+   ------------------------------------------------ */
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+
+  /* Use our brand colors */
+  background-color: var(--color-midnight-anna-dweebe);
+  color:            var(--color-white-dweebe);
+}
+
+/* Links */
+a {
+  font-weight: 500;
+  color: var(--color-epurple-dweebe);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--color-melyellow-dweebe);
+}
+
+/* Headings */
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+/* Buttons */
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--color-midnight-anna-dweebe);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: var(--color-egreen-dweebe);
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* 3) Light‐mode overrides
+   ------------------------------------------------ */
+@media (prefers-color-scheme: light) {
+  body {
+    background-color: #ffffff;
+    color:            #213547;
+  }
+  a:hover {
+    color: var(--color-midnight-anna-dweebe);
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}

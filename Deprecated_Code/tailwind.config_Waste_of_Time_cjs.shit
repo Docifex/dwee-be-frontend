@@ -1,0 +1,65 @@
+// for dwee.be website
+/**
+ * tailwind.config.cjs
+ * This file configures Tailwind CSS for the Dwee.be website.
+ * It defines the content sources and extends the default theme with custom colors.
+ * It imports the colors defined in src/theme/colors.js to ensure consistency across the application.
+ * The colors are also used in src/components/LandingPage.jsx for the animated balls.
+ */
+
+const { BRAND_COLORS } = require('../src/theme/colors.js');
+
+console.log('BRAND_COLORS =', JSON.stringify(BRAND_COLORS, null, 2))
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./index.html",
+    "./tail*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./tailwind.config.js",
+    
+  ],
+  theme: {
+    extend: {
+      colors: BRAND_COLORS, // Use the imported colors directly
+      // Alternatively, you can define them inline if needed
+       'blackpurpledweebe': '#00b0119',
+       'eblue-dweebe': '#00e1ff',     
+       'eorange-dweebe': '#fb6e05',
+       'epink-dweebe': '#f617de',
+       'egreen-dweebe': '#17f851',
+
+       'emint-dweebe': '#01ffcd',
+       'mred-dweebe': '#f0532b',
+       'ered-dweebe': '#f70000',
+       'mblue-dweebe': '#0f227e',
+       'msalmon-dweebe': '#d6976f',
+       'dgray-dweebe': '#141414',
+
+       'nightsky-dweebe': '#090f15',
+       'epurple-dweebe': '#8c1ffa',
+
+      
+      },
+    },
+
+  plugins: [],
+}
+
+
+/* Define the brand colors directly in the theme
+        'black-purple-dweebe': '#00b0119', // black with a little purple fade
+        'eblue-dweebe': '#00e1ff', // turquise electric blue
+        'eorange-dweebe': '#fb6e05',  // electric orange
+        'epink-dweebe': '#f617de', // pink electric
+        'egreen-dweebe': '#17f851', // green electric
+        'emint-dweebe': '#01ffcd', // electric mint
+        'mred-dweebe': '#f0532b', // red medium bright
+        'ered-dweebe': '#f70000', // red electric
+        'mblue-dweebe': '#0f227e', // medium blue
+        'msalmon-dweebe': '#d6976f', // medium salmon color
+        'dgray-dweebe': '#141414', // not black but dark gray
+        'nightsky-dweebe': '#090f15', // blueish night sky
+        'epurple-dweebe': '#8c1ffa', // purple electric
+        */

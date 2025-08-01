@@ -1,0 +1,225 @@
+/**
+ * AccountManagement.jsx
+ * Component for user account setup after login. 
+ * We want the users to have unique user names so we can associate their data with them.       
+ * Also for account management tasks.
+ */
+// src/components/AccountManagement.jsx
+import React, { useState, useEffect } from 'react';
+import { useMsal } from '@azure/msal-react';
+import { useNavigate } from 'react-router-dom';
+
+/**
+ * AccountManagement.jsx
+ * After MSAL login, allows the user to view their Entra ID info
+ * and complete account setup with additional profile data.
+ */
+export default function AccountManagement() {
+  const { accounts } = useMsal();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    userName: '',
+    phones: [''],
+    emails: [],
+    address: { street: '', city: '', state: '', postalCode: '', country: '' },
+    billing: { cardNumber: '', expiry: '', cvv: '' }
+  });
+  const [errors, setErrors] = useState({ userName: '' });
+
+  // Pre-fill from MSAL account
+  useEffect(() => {
+    if (accounts.length === 0) {
+      navigate('/', { replace: true });
+      return;
+    }
+    const account = accounts[0];
+    const initialEmails = [{ email: account.username, primary: true }];
+    setFormData(data => ({
+      ...data,
+      emails: initialEmails
+    }));
+    setLoading(false);
+  }, [accounts, navigate]);
+
+  const validate = () => {
+    const errs = {};
+    if (formData.userName.trim().length < 3) {
+      errs.userName = 'User name must be at least 3 characters';
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const handleArrayChange = (key, index, value) => {
+    const arr = [...formData[key]];
+    arr[index] = value;
+    setFormData({ ...formData, [key]: arr });
+  };
+
+  const addArrayItem = key => {
+    setFormData({ ...formData, [key]: [...formData[key], key === 'phones' ? '' : { email: '', primary: false }] });
+  };
+
+  const removeArrayItem = (key, index) => {
+    const arr = formData[key].filter((_, i) => i !== index);
+    setFormData({ ...formData, [key]: arr });
+  };
+
+  const setPrimaryEmail = idx => {
+    const emails = formData.emails.map((e, i) => ({ ...e, primary: i === idx }));
+    setFormData({ ...formData, emails });
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    if (!validate()) return;
+    setLoading(true);
+    try {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const account = accounts[0];
+      const payload = {
+        externalId: account.idTokenClaims.oid,
+        email: account.username,
+        userName: formData.userName,
+        phones: formData.phones.filter(p => p.trim()),
+        emails: formData.emails,
+        address: formData.address,
+        billing: formData.billing
+      };
+      console.log('📤 About to POST user payload:', payload); // debugging code
+      const res = await fetch(`${apiBase}/api/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      console.log('📥 POST /api/users response:', res.status, await res.json()); // debugging code
+      if (!res.ok) throw new Error(res.statusText);
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      console.error('Account creation failed:', err);
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Loading account setup...</div>;
+
+  return (
+    <div style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif' }}>
+      <h1>Account Setup</h1>
+      <form onSubmit={handleSubmit}>
+        {/* Display Entra ID info */}
+        <section>
+          <h2>Your Entra ID Profile</h2>
+          <p><strong>Name:</strong> {accounts[0].name}</p>
+          <p><strong>Email:</strong> {accounts[0].username}</p>
+          <p><strong>Object ID:</strong> {accounts[0].idTokenClaims.oid}</p>
+        </section>
+
+        {/* User Name */}
+        <section>
+          <label>
+            User Name:
+            <input
+              type="text"
+              value={formData.userName}
+              onChange={e => handleChange('userName', e.target.value)}
+            />
+          </label>
+          {errors.userName && <div style={{ color: 'red' }}>{errors.userName}</div>}
+        </section>
+
+        {/* Phone Numbers */}
+        <section>
+          <h2>Phone Numbers</h2>
+          {formData.phones.map((phone, i) => (
+            <div key={i}>
+              <input
+                type="tel"
+                placeholder="Phone number"
+                value={phone}
+                onChange={e => handleArrayChange('phones', i, e.target.value)}
+              />
+              <button type="button" onClick={() => removeArrayItem('phones', i)}>Remove</button>
+            </div>
+          ))}
+          <button type="button" onClick={() => addArrayItem('phones')}>Add Phone</button>
+        </section>
+
+        {/* Email Addresses */}
+        <section>
+          <h2>Email Addresses</h2>
+          {formData.emails.map((em, i) => (
+            <div key={i}>
+              <input
+                type="email"
+                placeholder="Email address"
+                value={em.email}
+                onChange={e => {
+                  const arr = [...formData.emails]; arr[i].email = e.target.value;
+                  setFormData({ ...formData, emails: arr });
+                }}
+              />
+              <label>
+                <input
+                  type="radio"
+                  name="primaryEmail"
+                  checked={em.primary}
+                  onChange={() => setPrimaryEmail(i)}
+                /> Primary
+              </label>
+              {i > 0 && <button type="button" onClick={() => removeArrayItem('emails', i)}>Remove</button>}
+            </div>
+          ))}
+          <button type="button" onClick={() => addArrayItem('emails')}>Add Email</button>
+        </section>
+
+        {/* Address */}
+        <section>
+          <h2>Address</h2>
+          {Object.entries(formData.address).map(([key, val]) => (
+            <div key={key}>
+              <label>
+                {key.charAt(0).toUpperCase() + key.slice(1)}:
+                <input
+                  type="text"
+                  value={val}
+                  onChange={e => setFormData({
+                    ...formData,
+                    address: { ...formData.address, [key]: e.target.value }
+                  })}
+                />
+              </label>
+            </div>
+          ))}
+        </section>
+
+        {/* Billing Information */}
+        <section>
+          <h2>Billing Information</h2>
+          {['cardNumber', 'expiry', 'cvv'].map(field => (
+            <div key={field}>
+              <label>
+                {field.replace(/([A-Z])/g, ' $1').trim()}:
+                <input
+                  type="text"
+                  value={formData.billing[field]}
+                  onChange={e => setFormData({
+                    ...formData,
+                    billing: { ...formData.billing, [field]: e.target.value }
+                  })}
+                />
+              </label>
+            </div>
+          ))}
+        </section>
+
+        <button type="submit">Save Account</button>
+      </form>
+    </div>
+  );
+}

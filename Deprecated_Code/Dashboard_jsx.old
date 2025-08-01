@@ -1,0 +1,121 @@
+// src/components/Dashboard.jsx
+
+import React, { useEffect, useState } from 'react';
+import { useMsal } from '@azure/msal-react';
+import { useNavigate } from 'react-router-dom';
+
+/**
+ * dweebeAppUser HOC - Higher Order Component
+ * Checks if the authenticated MSAL user has an application account.
+ * - If yes: renders the wrapped Dashboard component
+ * - If no: redirects to /account-management to set up an account
+ */
+function dweebeAppUser(WrappedComponent) {
+  return function WithAppUser(props) {
+    const { accounts } = useMsal();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const [userExists, setUserExists] = useState(false);
+
+    useEffect(() => {
+      async function checkUser() {
+        console.log('Checking user existence...');
+        if (!accounts || accounts.length === 0) {
+          // No MSAL account at all → redirect to landing or login
+          setLoading(false);
+          navigate('/', { replace: true });
+          return;
+        }
+
+        const oid = accounts[0].idTokenClaims.oid;
+        console.log('Checking user with OID:', oid);
+        const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+        console.log('API Base URL:', apiBase);
+        if (!apiBase) {
+          // No backend API available yet
+          setUserExists(true);
+          setLoading(false);
+          return;
+        }
+
+        try {
+          console.log('About to call user API at:', `${apiBase}/api/users/${oid}`);
+          // Call the API to check if user exists
+          // This assumes the API is running and accessible at the specified base URL
+          const res = await fetch(`${apiBase}/api/users/${oid}`, { method: 'GET' });
+          console.log('User check response:', res.status);
+          if (res.ok) {
+            let userRecord;
+            try {
+              userRecord = await res.json();
+            } catch (parseError) {
+              console.error('Invalid JSON from user API:', parseError);
+              setLoading(false);
+              navigate('/account-management', { replace: true });
+              return;
+            }
+            if (userRecord && userRecord.id) {
+              setUserExists(true);
+              console.log('User exists:', userRecord);
+              // User exists, render the wrapped component
+            } else {
+              setLoading(false);
+              navigate('/account-management', { replace: true });
+              return;
+            }
+          } else if (res.status === 404) {
+            // user not found
+            setLoading(false);
+            navigate('/account-management', { replace: true });
+            return;
+          } else {
+            console.error('Failed to check user:', res.statusText);
+          }
+        } catch (e) {
+          console.error('Error checking user existence:', e);
+          setLoading(false);
+          navigate('/account-management', { replace: true });
+          return;
+        }
+
+        // All done
+        setLoading(false);
+      }
+      checkUser();
+    }, [accounts, navigate]);
+
+    if (loading) {
+      return <div>Loading user info...</div>; 
+      console.log('Loading user info...');
+    }
+
+    return userExists ? <WrappedComponent {...props} /> : null;
+  };
+}
+
+/**
+ * Dashboard.jsx
+ * Stub component to verify post-login routing.
+ * Wrapped with dweebeAppUser to enforce user-setup.
+ */
+function Dashboard() {
+  return (
+    <div style={{
+      backgroundColor: '#4a90e2',
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      color: '#ffffff',
+      fontSize: '2rem',
+      margin: 0,
+    }}>
+      Dashboard Loaded
+    </div>
+  );
+}
+
+// Export the wrapped component
+export default dweebeAppUser(Dashboard);
+

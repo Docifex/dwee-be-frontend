@@ -1,0 +1,14 @@
+/**
+
+module.exports = {
+  extends: [
+    'stylelint-config-standard',
+    'stylelint-config-recommended-tailwindcss'
+  ],
+  rules: {
+    // You can add or override specific rules here if desired
+    // e.g. turn off a rule:
+    // 'block-no-empty': null,
+  }
+}
+ */

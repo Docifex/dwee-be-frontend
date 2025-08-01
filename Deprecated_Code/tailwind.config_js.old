@@ -1,0 +1,32 @@
+// for dwee.be website
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./index.html",
+    "./tail*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./tailwind.config.js",
+    
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'black-red-dweebe': '#0d0000', // black with a little red fade
+        'eblue-dweebe': '#00e1ff', // turquise electric blue
+        'eorange-dweebe': '#fb6e05',  // electric orange
+        'epink-dweebe': '#f617de', // pink electric
+        'egreen-dweebe': '#17f851', // green electric
+        'emint-dweebe': '#01ffcd', // electric mint
+        'mred-dweebe': '#f0532b', // red medium bright
+        'ered-dweebe': '#f70000', // red electric
+        'mblue-dweebe': '#0f227e', // medium blue
+        'msalmon-dweebe': '#d6976f', // medium salmon color
+        'dgray-dweebe': '#141414', // not black but dark gray
+        'nightsky-dweebe': '#090f15', // blueish night sky
+        'epurple-dweebe': '#8c1ffa', // purple electric
+      },
+    },
+  },
+  plugins: [],
+}

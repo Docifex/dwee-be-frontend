@@ -1,0 +1,382 @@
+
+/* AccountManagement.css
+    ────────────────────────────────────────────────────────────────────────────
+    src/components/AccountManagement.css
+    Pure CSS—no Tailwind dependencies
+    ──────────────────────────────────────────────────────────────────────────── 
+     
+Copied these values exactly from our src/theme/colors.js */
+
+
+:root {
+  --color-black-purple-dweebe:   #1a0123; /* BRAND_COLORS.black-purple-dweebe */
+  --color-eblue-dweebe:          #00e1ff; /* BRAND_COLORS.eblue.dweebe turquise electric blue */
+  --color-eorange-dweebe:        #fb6e05; /* BRAND_COLORS.eorange.dweebe electric orange */
+  --color-epink-dweebe:          #f617de; /* BRAND_COLORS.epink.dweebe pink electric*/
+  --color-egreen-dweebe:         #17f851; /* BRAND_COLORS.egreen.dweebe green electric */
+  --color-emint-dweebe:          #01ffcd; /* BRAND_COLORS.emint.dweebe electric mint*/
+  --color-mred-dweebe:           #d24a24; /* BRAND_COLORS.mred.dweebe color for david and anna d24 & a24*/
+  --color-ered-dweebe:           #f70000; /* BRAND_COLORS.ered.dweebe red electric*/
+  --color-mblue-dweebe:          #0f227e; /* BRAND_COLORS.mblue.dweebe medium blue */
+  --color-msalmon-dweebe:        #d6976f; /* BRAND_COLORS.msalmon.dweebe medium salmon color*/
+  --color-dgray-dweebe:          #141414; /* BRAND_COLORS.dgray.dweebe not black but dark gray*/
+  --color-nightsky-dweebe:       #05010d; /* BRAND_COLORS.nightsky-dweebe blueish night sky*/
+  --color-epurple-dweebe:        #8c1ffa; /* BRAND_COLORS.epurple.dweebe purple electric */   
+  --color-white-dweebe:          #f9f9ef; /* BRAND_COLORS.white.dweebe white with a little sun*/
+  --color-midnight-anna-dweebe:  #00000a; /* BRAND_COLORS.midnight-anna-dweebe midnight blue for Anna */
+  --color-melyellow-dweebe:      #eded06ff; /* BRAND_COLORS.melyellow-dweebe mellow yellow  */
+
+}
+/* Account Management Page and Element Styles */
+
+/* Make container fill screen */
+.account-container.full-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center; /* centers horizontally */
+  
+}
+/* grid is supposed to fill the remaining space */
+.account-form-grid.full-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 3rem;
+  width: 95%; /*95% keeps the boxes away from the right and left sides of the screen */
+  margin: 0 10px 0 10px auto; /* centers grid horizontally */
+  justify-items: auto; /* centers items inside grid cells */
+}
+
+.account-header {
+  display: flex;
+  justify-content: space-between; /* space-between; */
+  align-items: center;
+  width: 100%;
+  background-color: var(--color-dgray-dweebe);
+  color: var(--color-melyellow-dweebe);
+  margin-bottom: 1rem;
+  
+}
+
+.header-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.exit-button {
+  padding: .8rem .8rem;
+  font-size: 1.5rem;
+  background-color: var(--color-ered-dweebe);
+  color: var(--color-white-dweebe);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-button {
+  padding: 0.8rem 0.8rem;
+  font-size: 2.1rem;
+  background-color: var(--color-egreen-dweebe);
+  color: var(--color-ered-dweebe);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-button:disabled {
+  background-color: gray;
+  color: var(--color-dgray-dweebe);
+  cursor: not-allowed;
+}
+.account-title.full-width {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.section {
+  padding: 1rem;
+  border-radius: 8px;
+  height: 100%; /* Force each tile to stretch */
+  box-sizing: border-box;
+}
+
+
+.user-section {  /* USER NAME Section */
+ background-color: var(--color-egreen-dweebe);
+ color: var(--color-epurple-dweebe);
+ padding : .2rem;
+  font-size: .9rem;
+  border-radius: 0.5rem;
+    margin-bottom: .1rem;
+    text-align: center;
+    border: 8px solid var(--color-epurple-dweebe);
+    margin-top: 0rem;
+ 
+  height: 100%; /* Force each tile to stretch */
+  box-sizing: border-box
+
+
+}   
+
+.user-name {
+  color: var(--color-epurple-dweebe);
+  font-weight: bold;
+  font-size: 0.9rem;
+  gap: .1rem;
+  margin-bottom: 0.1rem;
+  text-align: end;
+  align-items: end;
+}   
+
+.user-name label {
+    align-items: end;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.user-name-input {
+  width: 70%;
+  padding: 0.1rem;
+  font-size: 0.9rem;
+  border: 3px solid var(--color-epurple-dweebe);
+  border-radius: 0.25rem;
+  background-color: color-mix(in srgb, var(--color-white-dweebe) 70%, transparent);
+  color: var(--color-midnight-anna-dweebe);
+  text-align: left;
+}   
+
+.user-name-input:focus {
+  outline: solid 3px var(--color-epink-dweebe);
+  border-color: var(--color-epink-dweebe);
+}   
+
+.subscription-fields {
+  text-align: end;
+  gap: 0rem;
+  margin-top: 0.4rem;
+  margin-bottom: 0.1rem;
+}
+
+.subscription-fields label {
+ 
+  align-items: end;
+  font-size: .9rem;
+  
+}
+
+.subscription-fields input[type="text"],
+.subscription-fields input[type="date"] {
+  width: 60%;
+  
+  font-size: .8rem;
+  margin-top: 0.1rem;
+  border: 1.5px solid var(--color-epurple-dweebe);
+  background-color: color-mix(in srgb, var(--color-white-dweebe) 70%, transparent);
+  color: var(--color-midnight-anna-dweebe);
+}
+
+.subscription-fields:focus {
+     outline: solid 1.5px var(--color-epink-dweebe);
+     border-color: var(--color-epink-dweebe);
+      background-color:  var(--color-white-dweebe);
+}
+
+.emails-section {  /* Email Addresses Section */
+  background-color: var(--color-epink-dweebe);
+  color: var(--color-melyellow-dweebe);
+  padding : .2rem;
+  font-size: .9rem;
+  border-radius: 0.5rem;
+    margin-bottom: .1rem;
+    text-align: center;
+    border: 8px solid var(--color-melyellow-dweebe);
+  height: 100%; /* Force each tile to stretch */
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.email-input {
+  
+  width: 50%;
+  padding: 0.1rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-mblue-dweebe);
+  border-radius: 0.25rem;
+  background-color: color-mix(in srgb, var(--color-white-dweebe) 80%, transparent);
+  color: var(--color-midnight-anna-dweebe);
+  text-align: right;
+  gap: 0rem;
+  margin-top: 0.2rem;
+  align-items: center;
+}   
+.email-input:focus {
+  outline: solid 2px var(--color-egreen-dweebe);
+  border-color: var(--color-epink-dweebe);
+}   
+ 
+
+.phone-number {
+    color: var(--color-melyellow-dweebe)
+}
+
+.phone-input {
+  width: 50%;
+  padding: 0.1rem;
+  font-size: .9rem;
+  border: 2px solid var(--color-mblue-dweebe);
+  border-radius: 0.25rem;
+   background-color: color-mix(in srgb, var(--color-white-dweebe) 80%, transparent);
+  color: var(--color-midnight-anna-dweebe);
+}
+
+.phone-input:focus {
+  outline: solid 2px var(--color-egreen-dweebe);
+  border-color: var(--color-epink-dweebe);
+}
+
+.person-section {  /* Personal Information Section */
+  background-color: var(--color-egreen-dweebe);
+ color: var(--color-epurple-dweebe);
+ padding : .2rem;
+  border-radius: 0.5rem;
+    margin-bottom: .1rem;
+    text-align: center;
+    border: 8px solid var(--color-epurple-dweebe);
+    margin-top: 0rem;
+  height: 100%; /* Force each tile to stretch */
+  box-sizing: border-box;
+    
+}
+
+.person-section-title { /*currently says "Personal Information" */
+    font-size: 1.rem;
+    text-align: center;
+
+}
+.person-fields {
+  width: 90%;
+    font-size: 0.9rem;
+  align-items: end;
+    text-align: end;
+    
+}
+.person-fields input[type="text"] {
+  width: 90%;
+  padding: 0.1rem;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+  border: 2px solid var(--color-epurple-dweebe);
+  background-color: color-mix(in srgb, var(--color-white-dweebe) 70%, transparent);
+  color: var(--color-midnight-anna-dweebe);
+    align-items: end;
+  text-align: left;
+}
+
+.person-input:focus {
+  outline: solid 2px var(--color-epink-dweebe);
+  border-color: var(--color-epink-dweebe);
+  
+}
+
+
+.address-section {  /* Addresses Section */
+   background-color: var(--color-epink-dweebe);
+  color: var(--color-melyellow-dweebe);
+  padding : .2rem;
+  border-radius: 0.5rem;
+    margin-bottom: .1rem;
+    text-align: center;
+    border: 8px solid var(--color-melyellow-dweebe);
+    margin-top: 0rem;
+  height: 100%; /* Force each tile to stretch */
+  box-sizing: border-box
+}
+
+.address-section-title { /* Currently says "Address" */
+    font-size: .9rem;
+    text-align: center;
+
+}
+.address-fields {
+  width: 100%;
+    font-size: .9rem;
+  align-items: end;
+    text-align: end;
+    
+}
+.address-fields input[type="text"] {
+  width: 70%;
+  padding: 0.1rem;
+  font-size: .9rem;
+  margin-top: 0.2rem;
+  border: 2px solid var(--color-epurple-dweebe);
+  background-color: color-mix(in srgb, var(--color-white-dweebe) 70%, transparent);
+  color: var(--color-midnight-anna-dweebe);
+    align-items: end;
+  text-align: left;
+}
+
+.address-input:focus {
+  outline: solid 2px var(--color-egreen-dweebe);
+  border-color: var(--color-egreen-dweebe);
+  
+}
+
+.billing-section {  /* Billing Information Section */
+  background-color: var(--color-egreen-dweebe);
+ color: var(--color-epurple-dweebe);
+ padding : .2rem;
+  border-radius: 0.5rem;
+    margin-bottom: .1rem;
+    text-align: center;
+    border: 8px solid var(--color-epurple-dweebe);
+    margin-top: 0rem;
+  height: 100%; /* Force each tile to stretch */
+  box-sizing: border-box
+}
+
+.billing-fields {
+    color: var(--color-epurple-dweebe)
+    font-size: .9rem;
+    text-align: end;  /*this value in this -fields section aligns the entry boxes and their text*/
+}
+
+.billing-input {
+  width: 60%;
+  padding: 0.1rem;
+  font-size: .9rem;
+  margin-top: 0.2rem;
+  border: 2px solid var(--color-epurple-dweebe);
+  background-color: color-mix(in srgb, var(--color-white-dweebe) 70%, transparent);
+  color: var(--color-midnight-anna-dweebe);
+    align-items: end;
+  text-align: left;
+}
+
+.profile-section { /* Your Microsoft Entra ID Profile */
+  background-color: var(--color-dgray-dweebe);
+  color: var(--color-eblue-dweebe);
+  padding : .2rem;
+  border-radius: 0.5rem;
+    margin-bottom: .1rem;
+    text-align: center;
+    border: 8px solid var(--color-mblue-dweebe);
+    margin-top: 0rem;
+    
+  height: 100%; /* Force each tile to stretch */
+  box-sizing: border-box
+}
+
+.profile-heading {
+  color: var(--color-eblue-dweebe);
+  text-align: center;
+}
+
+.profile-heading2 { 
+    text-align: center;
+    color: var(--color-melyellow-dweebe);
+}

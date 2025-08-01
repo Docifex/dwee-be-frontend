@@ -1,0 +1,303 @@
+// server.js
+// Basic Express API for DWEEBE User Management
+// need to install express and cors
+// npm install express cors 
+
+// server.js
+// Production-ready Express API for DWEEBE User Management with Azure Cosmos DB
+
+const path = require('path');
+// construct a path and load environment variables from project root .env so there is only one .env file
+// This allows us to use the same .env file for both the client and server
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
+const cors = require('cors');
+
+
+
+const express = require('express');
+const { CosmosClient } = require('@azure/cosmos');
+
+const app = express();
+
+// 🚨 TEMPORARILY allow all origins (for debugging only)
+app.use(cors());  // debugging code, remove in production
+
+// DEBUG: Log all incoming requests
+app.use((req, res, next) => {       
+    console.log(`[API] ${req.method} ${req.url}`);  // debugging code, remove in production
+    next();
+    });
+
+const PORT = process.env.PORT || 31415;
+
+app.use((req, res, next) => {
+  console.log(`[API] ${req.method} ${req.url}`);
+  next();
+});
+
+// Cosmos DB configuration from environment variables
+const {
+  COSMOS_ENDPOINT,
+  COSMOS_KEY,
+  COSMOS_DATABASE_ID_USERS,
+  COSMOS_CONTAINER_ID_USERS,
+  CORS_ORIGIN
+} = process.env;
+
+if (!COSMOS_ENDPOINT || !COSMOS_KEY || !COSMOS_DATABASE_ID_USERS || !COSMOS_CONTAINER_ID_USERS) {
+  console.error('Missing Cosmos DB configuration in environment variables.');
+  process.exit(1);
+}
+
+// Initialize Cosmos client
+const client = new CosmosClient({ endpoint: COSMOS_ENDPOINT, key: COSMOS_KEY });
+const database = client.database(COSMOS_DATABASE_ID_USERS);
+const container = database.container(COSMOS_CONTAINER_ID_USERS);
+
+// Middleware
+app.use(express.json());
+// Enable CORS for our front-end origin
+if (CORS_ORIGIN) {
+  const cors = require('cors');
+  app.use(cors({ origin: CORS_ORIGIN }));
+}
+
+
+/** DEBUGGING BLOCK 
+/**
+ * GET /api/users/:oid
+ * Fetch a user record by external MSAL object ID.
+ * Returns 200 + user JSON if found, 404 if not.
+ 
+app.get('/api/users/:oid', async (req, res) => {
+  const { oid } = req.params;
+   console.log(`[API] GET /api/users/${oid} — handler start`);  // debuging code
+  console.log(`       COSMOS_ENDPOINT = ${COSMOS_ENDPOINT}`); // debuging code
+  console.log(`       COSMOS_KEY      = ${COSMOS_KEY ? '***' : '[missing]'}`); // debuging code
+    console.log(`       COSMOS_DATABASE_ID_USERS = ${COSMOS_DATABASE_ID_USERS}`); // debuging code
+    console.log(`       COSMOS_CONTAINER_ID_USERS = ${COSMOS_CONTAINER_ID_USERS}`); // debuging code
+  try {
+    // Read item by id and partition key (using oid for both)
+    const { resource } = await container.item(oid, oid).read();
+      console.log('[API] Cosmos read succeeded:', resource); // debuging code
+    if (resource) {
+      return res.json(resource);
+    }
+  } catch (err) {
+     console.log('[API] Cosmos read error:', err.code || err.message || err); // debuging code
+    if (err.code === 404) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    console.error('Cosmos DB read error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+  END DEBUGGING BLOCK  
+  */
+
+/**Production Block
+ * GET /api/users/:oid
+ * Fetch a user record by external MSAL object ID.
+ */
+// server.js
+// GET user by externalId
+
+
+app.get('/api/users/:oid', async (req, res) => {
+  const { oid } = req.params;
+  console.log(`[API] GET /api/users/${oid} — handler start`);
+
+  try {
+    // Attempt to read the item from Cosmos (id = oid, partitionKey = oid)
+    const { resource } = await container.item(oid, oid).read();
+
+    if (!resource) {
+      console.log('[API] Cosmos read returned no resource');
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    console.log('[API] Cosmos read succeeded:', resource);
+    return res.json(resource);
+  } catch (err) {
+    console.log('[API] Cosmos read error:', err.code || err.message || err);
+    if (err.code === 404) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+/**
+ * POST /api/users
+ * Create or update a user record.
+ * Body: { externalId: string, email: string }
+ * Returns the user record JSON.
+ */
+// POST create or update use
+
+app.post('/api/users', async (req, res) => {
+  const {
+    externalId,
+    email,
+    userName,
+    phones,
+    emails,
+    address,
+    billing,
+    subscription,
+    person,
+    roles // ✅ include roles from payload
+      //add a , and more items here from the Account Management form so it will be stored in the DB
+  } = req.body;
+
+ if (!externalId) {
+    res.status(400).json({ message: 'externalId is required' });
+    return;
+  }
+
+  try {
+    console.log('[API] Incoming payload body:', req.body);
+
+    // Read the existing document first
+    let existingUser = {};
+    try {
+      const readResult = await container.item(externalId, externalId).read();
+      existingUser = readResult.resource || {};
+      console.log('[API] Existing user from DB:', existingUser);
+    } catch (readErr) {
+      console.warn('[API] No existing user found or read error:', readErr);
+    }
+
+    // Merge existing fields first, then override with new values
+    const userItem = {
+      ...existingUser,
+      id: externalId,
+      externalId,
+      email: email || existingUser.email || null,
+      userName: userName || existingUser.userName || null,
+      phones: Array.isArray(phones) ? phones : existingUser.phones || [],
+      emails: Array.isArray(emails) ? emails : existingUser.emails || [],
+      address: typeof address === 'object' ? address : existingUser.address || {},
+      billing: typeof billing === 'object' ? billing : existingUser.billing || {},
+      subscription: typeof subscription === 'object' ? subscription : existingUser.subscription || {},
+      person: typeof person === 'object' ? person : existingUser.person || {},
+      roles: Array.isArray(roles) ? roles : existingUser?.roles || [], // ✅ persist roles
+      createdAt: existingUser.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    console.log('[API] Upserting user with roles:', userItem.roles);
+    console.log('[API] Upserting user with final payload:', JSON.stringify(userItem, null, 2));
+
+    const { resource } = await container.items.upsert(userItem);
+    console.log('[API] Upsert complete. DB returned:', resource);
+    res.json(resource);
+
+  } catch (err) {
+console.error('Cosmos DB upsert error:', err);
+res.status(500).json({ message: 'Internal server error' });
+}
+});
+
+// PATCH endpoint to update roles only
+app.patch('/api/users/:oid/roles', async (req, res) => {
+const { oid } = req.params;
+const { roles } = req.body;
+
+if (!Array.isArray(roles)) {
+return res.status(400).json({ message: 'roles must be an array' });
+}
+
+try {
+const { resource: existingUser } = await container.item(oid, oid).read();
+if (!existingUser) return res.status(404).json({ message: 'User not found' });
+
+existingUser.roles = roles;
+existingUser.updatedAt = new Date().toISOString();
+
+const { resource } = await container.items.upsert(existingUser);
+res.json(resource);
+
+
+//* end APP patch
+
+  } catch (err) {
+    console.error('Cosmos DB upsert error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`DWEEBE API listening on http://localhost:${PORT}`);
+});
+
+// chatbox support backend
+
+app.post('/api/dweebe-spawn', async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ message: 'Message is required' });
+
+    // Create DWEEBE entry for the message
+    const dweebeEntry = {
+      id: `dweebe_${Date.now()}`,
+      type: 'DWEEBESpawnEvent',
+      message,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await container.items.create(dweebeEntry);
+
+    return res.json({
+      success: true,
+      responseText: `DWEEBE received your message: "${message}"`,
+    });
+  } catch (err) {
+    console.error('Error handling /api/dweebe-spawn:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Backend code for /api/dweebe-spawn route with DWEEBE schema support
+// Cosmos DB client setup
+const cosmosClient = new CosmosClient({ endpoint: process.env.COSMOS_ENDPOINT, key: process.env.COSMOS_KEY });
+
+// DWEEBE schema example for spawn event
+function createDweebeSpawn(message) {
+  return {
+    id: `dweebe_${Date.now()}`,
+    type: 'DWEEBESpawnEvent',
+    message,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    metadata: {
+      origin: 'chatbox',
+      user: 'authenticated_user_placeholder',
+      resonanceGlyph: '🗣️✨'
+    }
+  };
+}
+
+app.post('/api/dweebe-spawn', async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: 'Message is required' });
+
+    const dweebeEntry = createDweebeSpawn(message);
+    await container.items.create(dweebeEntry);
+
+    return res.json({
+      success: true,
+      responseText: `DWEEBE received your message: "${message}"`,
+      dweebe: dweebeEntry
+    });
+  } catch (err) {
+    console.error('Error handling /api/dweebe-spawn:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+module.exports = app;

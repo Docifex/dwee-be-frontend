@@ -1,0 +1,65 @@
+Copied these values exactly from our src/theme/colors.js */
+
+
+:root {
+  --color-black-purple-dweebe:   #1a0123; /* BRAND_COLORS.black-purple-dweebe */
+  --color-eblue-dweebe:          #00e1ff; /* BRAND_COLORS.eblue.dweebe turquise electric blue */
+  --color-eorange-dweebe:        #fb6e05; /* BRAND_COLORS.eorange.dweebe electric orange */
+  --color-epink-dweebe:          #f617de; /* BRAND_COLORS.epink.dweebe pink electric*/
+  --color-egreen-dweebe:         #17f851; /* BRAND_COLORS.egreen.dweebe green electric */
+  --color-emint-dweebe:          #01ffcd; /* BRAND_COLORS.emint.dweebe electric mint*/
+  --color-mred-dweebe:           #d24a24; /* BRAND_COLORS.mred.dweebe color for david and anna d24 & a24*/
+  --color-ered-dweebe:           #f70000; /* BRAND_COLORS.ered.dweebe red electric*/
+  --color-mblue-dweebe:          #0f227e; /* BRAND_COLORS.mblue.dweebe medium blue */
+  --color-msalmon-dweebe:        #d6976f; /* BRAND_COLORS.msalmon.dweebe medium salmon color*/
+  --color-dgray-dweebe:          #141414; /* BRAND_COLORS.dgray.dweebe not black but dark gray*/
+  --color-nightsky-dweebe:       #05010d; /* BRAND_COLORS.nightsky-dweebe blueish night sky*/
+  --color-epurple-dweebe:        #8c1ffa; /* BRAND_COLORS.epurple.dweebe purple electric */   
+  --color-white-dweebe:          #f9f9ef; /* BRAND_COLORS.white.dweebe white with a little sun*/
+  --color-midnight-anna-dweebe:  #00000a; /* BRAND_COLORS.midnight-anna-dweebe midnight blue for Anna */
+  --color-melyellow-dweebe:      #eded06ff; /* BRAND_COLORS.melyellow-dweebe mellow yellow  */
+
+}
+
+.chatbox-container {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  height: 500px;
+  border: 2px solid var(--color-white-dweebe);
+  border-radius: 8px;
+}
+
+.chatbox-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.chat-message.user {
+  text-align: right;
+  color: var(--color-eblue-dweebe);
+}
+
+.chat-message.system {
+  text-align: left;
+  color: var(--color-egreen-dweebe);
+}
+
+.chatbox-input {
+  display: flex;
+  padding: 10px;
+  border-top: 2px solid var(--color-white-dweebe);
+}
+
+.chatbox-input input {
+  flex: 1;
+  padding: 5px;
+  color: var(--color-ewhite-dweebe);
+}
+
+.chatbox-input button {
+  margin-left: 5px;
+  padding: 5px 10px;
+  background: var(--color-epurple-dweebe)
+}

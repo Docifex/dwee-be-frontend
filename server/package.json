@@ -1,0 +1,45 @@
+{
+  
+    "name": "server",
+  
+    "version": "1.0.0",
+  
+    "main": "server.js",
+  
+    "keywords": [],
+  
+    "author": "",
+  
+    "license": "ISC",
+  
+    "description": "",
+  
+    "dependencies": {
+  
+      
+    "@azure/cosmos": "^4.5.0",
+  
+      
+    "cors": "^2.8.5",
+  
+      
+    "dotenv": "^17.2.1",
+  
+      
+    "express": "^5.1.0"
+  
+    },
+  
+    "scripts": {
+  
+      
+    "start:api": "set \"PORT=31415\" && node server.js",
+  
+      
+    "dev": "vite",
+  
+      
+    "start": "node server.js"
+  
+    }
+}

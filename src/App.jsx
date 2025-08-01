@@ -6,7 +6,7 @@ import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard.tsx'; 
 import ProtectedRoute from './components/ProtectedRoute';
 import AccountManagement from './components/AccountManagement.tsx';
-import DweebeAdminMain from './components/dweebeAdminMain.tsx';
+import DweebeAdminMain from './components/DweebeAdminMain.tsx';
 import { AuthContext } from './components/AuthWrapper.jsx';
 import { Navigate } from 'react-router-dom';
 
